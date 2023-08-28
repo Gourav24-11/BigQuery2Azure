@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant M as Main
+    participant TS as TransferService
+    participant C as Config
+    participant L as Logger
+    participant CL as CLI
+
+    M->>C: Initialize Config
+    M->>L: Initialize Logger
+    M->>TS: Initialize TransferService
+    M->>CL: Initialize CLI with TransferService, Config, and Logger
+    CL->>CL: Run CLI
+    CL->>TS: Transfer data
+    TS->>TS: Fetch data from Google BigQuery
+    TS->>TS: Transform data (if required)
+    TS->>TS: Insert data into Azure database
+    TS->>TS: Repeat until all data is transferred
+    TS->>L: Log transfer status
+    TS->>TS: Return
+    CL->>CL: Exit CLI
+    M->>L: Exit Logger

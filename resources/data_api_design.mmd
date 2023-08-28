@@ -1,0 +1,23 @@
+classDiagram
+    class TransferService{
+        +__init__(source_project_id: str, source_dataset_id: str, destination_connection_string: str)
+        +transfer_data(chunk_size: int, transform_func: Optional[Callable] = None) -> None
+    }
+    class Config{
+        +__init__(config_file: str)
+        +get(key: str) -> Any
+        +set(key: str, value: Any) -> None
+    }
+    class Logger{
+        +__init__(log_file: str)
+        +log(message: str) -> None
+    }
+    class CLI{
+        +__init__(transfer_service: TransferService, config: Config, logger: Logger)
+        +run() -> None
+    }
+    TransferService "1" -- "1" Config: has
+    TransferService "1" -- "1" Logger: has
+    CLI "1" -- "1" TransferService: uses
+    CLI "1" -- "1" Config: uses
+    CLI "1" -- "1" Logger: uses
