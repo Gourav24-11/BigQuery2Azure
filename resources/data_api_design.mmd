@@ -1,23 +1,11 @@
 classDiagram
-    class TransferService{
-        +__init__(source_project_id: str, source_dataset_id: str, destination_connection_string: str)
-        +transfer_data(chunk_size: int, transform_func: Optional[Callable] = None) -> None
-    }
-    class Config{
-        +__init__(config_file: str)
-        +get(key: str) -> Any
-        +set(key: str, value: Any) -> None
-    }
-    class Logger{
-        +__init__(log_file: str)
-        +log(message: str) -> None
-    }
-    class CLI{
-        +__init__(transfer_service: TransferService, config: Config, logger: Logger)
-        +run() -> None
-    }
-    TransferService "1" -- "1" Config: has
-    TransferService "1" -- "1" Logger: has
-    CLI "1" -- "1" TransferService: uses
-    CLI "1" -- "1" Config: uses
-    CLI "1" -- "1" Logger: uses
+    class BigQuery:
+        +extract_data(table: str, columns: List[str]) -> pd.DataFrame
+    class Azure:
+        +load_data(data: pd.DataFrame, table: str)
+    class API:
+        +get_table_list() -> List[str]
+        +get_column_list(table: str) -> List[str]
+        +transfer_data(table: str, columns: List[str], schedule: str)
+    class Scheduler:
+        +schedule_transfer(table: str, columns: List[str], schedule: str)

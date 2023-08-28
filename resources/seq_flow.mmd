@@ -1,21 +1,16 @@
 sequenceDiagram
     participant M as Main
-    participant TS as TransferService
-    participant C as Config
-    participant L as Logger
-    participant CL as CLI
+    participant BQ as BigQuery
+    participant AZ as Azure
+    participant AP as API
+    participant SC as Scheduler
 
-    M->>C: Initialize Config
-    M->>L: Initialize Logger
-    M->>TS: Initialize TransferService
-    M->>CL: Initialize CLI with TransferService, Config, and Logger
-    CL->>CL: Run CLI
-    CL->>TS: Transfer data
-    TS->>TS: Fetch data from Google BigQuery
-    TS->>TS: Transform data (if required)
-    TS->>TS: Insert data into Azure database
-    TS->>TS: Repeat until all data is transferred
-    TS->>L: Log transfer status
-    TS->>TS: Return
-    CL->>CL: Exit CLI
-    M->>L: Exit Logger
+    M->>BQ: extract_data(table, columns)
+    BQ-->>M: data
+    M->>AZ: load_data(data, table)
+    M->>AP: get_table_list()
+    AP-->>M: table_list
+    M->>AP: get_column_list(table)
+    AP-->>M: column_list
+    M->>AP: transfer_data(table, columns, schedule)
+    AP->>SC: schedule_transfer(table, columns, schedule)
