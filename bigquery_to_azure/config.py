@@ -1,32 +1,23 @@
 ## config.py
 
-from typing import Any
+# BigQuery configuration
+BIGQUERY_PROJECT_ID = "your_project_id"
+BIGQUERY_DATASET_ID = "your_dataset_id"
+BIGQUERY_TABLES = {
+    "ga4": "your_ga4_table",
+    "search_console": "your_search_console_table",
+    "google_ads": "your_google_ads_table"
+}
 
-class Config:
-    def __init__(self, config_file: str):
-        self.config_file = config_file
-        self.config_data = self.load_config()
+# Azure configuration
+AZURE_SERVER = "your_azure_server"
+AZURE_DATABASE = "your_azure_database"
+AZURE_USERNAME = "your_azure_username"
+AZURE_PASSWORD = "your_azure_password"
 
-    def load_config(self) -> dict:
-        """
-        Load the configuration data from the config file.
-        """
-        # Implementation goes here
+# API configuration
+API_HOST = "your_api_host"
+API_PORT = 8000
 
-    def save_config(self) -> None:
-        """
-        Save the configuration data to the config file.
-        """
-        # Implementation goes here
-
-    def get(self, key: str) -> Any:
-        """
-        Get the value of a configuration setting.
-        """
-        # Implementation goes here
-
-    def set(self, key: str, value: Any) -> None:
-        """
-        Set the value of a configuration setting.
-        """
-        # Implementation goes here
+# Scheduler configuration
+SCHEDULE_INTERVAL = "0 0 * * *"

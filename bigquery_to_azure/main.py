@@ -1,26 +1,34 @@
-from transfer_service import TransferService
-from config import Config
-from logger import Logger
-from cli import CLI
+import pandas as pd
+from typing import List
+from datetime import datetime
+import time
+from config import (
+    BIGQUERY_PROJECT_ID,
+    BIGQUERY_DATASET_ID,
+    AZURE_SERVER,
+    AZURE_DATABASE,
+    AZURE_USERNAME,
+    AZURE_PASSWORD,
+    API_HOST,
+    API_PORT,
+    SCHEDULE_INTERVAL
+)
+from bigquery import BigQuery
+from azure import Azure
+from api import API
+from scheduler import Scheduler
 
 def main():
-    # Initialize Config
-    config = Config("config.json")
+    # Initialize BigQuery and Azure instances
+    bigquery = BigQuery(BIGQUERY_PROJECT_ID, BIGQUERY_DATASET_ID)
+    azure = Azure(AZURE_SERVER, AZURE_DATABASE, AZURE_USERNAME, AZURE_PASSWORD)
 
-    # Initialize Logger
-    logger = Logger("log.txt")
+    # Initialize API and Scheduler instances
+    api = API(bigquery, azure)
+    scheduler = Scheduler(api)
 
-    # Initialize TransferService
-    source_project_id = config.get("source_project_id")
-    source_dataset_id = config.get("source_dataset_id")
-    destination_connection_string = config.get("destination_connection_string")
-    transfer_service = TransferService(source_project_id, source_dataset_id, destination_connection_string)
-
-    # Initialize CLI
-    cli = CLI(transfer_service, config, logger)
-
-    # Run CLI
-    cli.run()
+    # Schedule the data transfer
+    scheduler.schedule_transfer(table="your_table", columns=["column1", "column2"], schedule=SCHEDULE_INTERVAL)
 
 if __name__ == "__main__":
     main()
