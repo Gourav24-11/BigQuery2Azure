@@ -1,12 +1,13 @@
 ## Implementation approach:
-To implement the tool that integrates with Google BigQuery APIs and transfers data to an Azure database, we will use the following approach:
+To efficiently transfer data from Google BigQuery to Azure database and ensure alignment with GA4, Google Search Console, and Google Ads data, we will use the following open-source tools:
 
-1. Use the `google-cloud-bigquery` library to connect to Google BigQuery and retrieve data.
-2. Use the `pyodbc` library to connect to the Azure database and insert data.
-3. Implement a data transfer service that fetches data from Google BigQuery in chunks, transforms it if required, and inserts it into the Azure database.
-4. Use the `schedule` library to schedule regular data transfers at specific intervals.
-5. Implement error handling and logging mechanisms to ensure data integrity and provide troubleshooting information.
-6. Design a user-friendly command-line interface (CLI) for users to interact with the tool and configure transfer settings.
+1. **Apache Airflow**: Airflow is a platform to programmatically author, schedule, and monitor workflows. We can use it to schedule and automate the data transfer process.
+
+2. **Google Cloud SDK**: The Google Cloud SDK provides command-line tools and libraries for interacting with Google Cloud services, including BigQuery. We can use it to extract data from BigQuery.
+
+3. **Azure SDK for Python**: The Azure SDK for Python provides libraries for interacting with Azure services, including the Azure database. We can use it to load data into the Azure database.
+
+4. **FastAPI**: FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. We can use it to create a user-friendly API for easy configuration and monitoring of the data transfer process.
 
 ## Python package name:
 ```python
@@ -17,64 +18,48 @@ To implement the tool that integrates with Google BigQuery APIs and transfers da
 ```python
 [
     "main.py",
-    "transfer_service.py",
     "config.py",
-    "logger.py",
-    "cli.py"
+    "bigquery.py",
+    "azure.py",
+    "api.py",
+    "scheduler.py"
 ]
 ```
 
 ## Data structures and interface definitions:
 ```mermaid
 classDiagram
-    class TransferService{
-        +__init__(source_project_id: str, source_dataset_id: str, destination_connection_string: str)
-        +transfer_data(chunk_size: int, transform_func: Optional[Callable] = None) -> None
-    }
-    class Config{
-        +__init__(config_file: str)
-        +get(key: str) -> Any
-        +set(key: str, value: Any) -> None
-    }
-    class Logger{
-        +__init__(log_file: str)
-        +log(message: str) -> None
-    }
-    class CLI{
-        +__init__(transfer_service: TransferService, config: Config, logger: Logger)
-        +run() -> None
-    }
-    TransferService "1" -- "1" Config: has
-    TransferService "1" -- "1" Logger: has
-    CLI "1" -- "1" TransferService: uses
-    CLI "1" -- "1" Config: uses
-    CLI "1" -- "1" Logger: uses
+    class BigQuery:
+        +extract_data(table: str, columns: List[str]) -> pd.DataFrame
+    class Azure:
+        +load_data(data: pd.DataFrame, table: str)
+    class API:
+        +get_table_list() -> List[str]
+        +get_column_list(table: str) -> List[str]
+        +transfer_data(table: str, columns: List[str], schedule: str)
+    class Scheduler:
+        +schedule_transfer(table: str, columns: List[str], schedule: str)
 ```
 
 ## Program call flow:
 ```mermaid
 sequenceDiagram
     participant M as Main
-    participant TS as TransferService
-    participant C as Config
-    participant L as Logger
-    participant CL as CLI
+    participant BQ as BigQuery
+    participant AZ as Azure
+    participant AP as API
+    participant SC as Scheduler
 
-    M->>C: Initialize Config
-    M->>L: Initialize Logger
-    M->>TS: Initialize TransferService
-    M->>CL: Initialize CLI with TransferService, Config, and Logger
-    CL->>CL: Run CLI
-    CL->>TS: Transfer data
-    TS->>TS: Fetch data from Google BigQuery
-    TS->>TS: Transform data (if required)
-    TS->>TS: Insert data into Azure database
-    TS->>TS: Repeat until all data is transferred
-    TS->>L: Log transfer status
-    TS->>TS: Return
-    CL->>CL: Exit CLI
-    M->>L: Exit Logger
+    M->>BQ: extract_data(table, columns)
+    BQ-->>M: data
+    M->>AZ: load_data(data, table)
+    M->>AP: get_table_list()
+    AP-->>M: table_list
+    M->>AP: get_column_list(table)
+    AP-->>M: column_list
+    M->>AP: transfer_data(table, columns, schedule)
+    AP->>SC: schedule_transfer(table, columns, schedule)
 ```
 
 ## Anything UNCLEAR:
-The requirements are clear to me.
+The requirements are clear.
